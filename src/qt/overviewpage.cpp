@@ -175,7 +175,7 @@ void OverviewPage::setModel(WalletModel *model)
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
     }
 
-    // update the display unit, to not use the default ("GMC")
+    // update the display unit, to not use the default ("GME")
     updateDisplayUnit();
 }
 

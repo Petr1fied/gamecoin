@@ -1,0 +1,9 @@
+Building Feathercoin
+
+See doc/readme-qt.rst for instructions on building Gamecoin-QT,
+the intended-for-end-users, nice-graphical-interface, reference
+implementation of Feathercoin.
+
+See doc/build-*.txt for instructions on building featehrcoind,
+the intended-for-services, no-graphical-interface, reference
+implementation of Litecoin.

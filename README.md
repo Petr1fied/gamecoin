@@ -8,7 +8,7 @@ The rest is the same as bitcoin.
  - 2016 blocks to retarget difficulty
  
 Download
-See http://www.gamecoin.cc
+See ~~http://www.gamecoin.cc~~ Stay tuned for new download location as it becomes available
 
 Development process
 ===================
@@ -38,4 +38,5 @@ Issues with no commits will be given a similar warning, and closed after
 15 days from their last activity. Issues closed in this manner will be 
 labeled 'stale'. 
 
-Check out http://gamecoin.cc for more info about the development.
+Check out ~~http://gamecoin.cc~~ for more info about the development.
+This is an unofficial fork.

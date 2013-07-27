@@ -8,7 +8,7 @@ The rest is the same as bitcoin.
  - 48 blocks to retarget difficulty
  
 Download
-See http://bit.ly/1bud0WT Stay tuned for new download location as it becomes available
+See http://bit.ly/1ccGDK7 Stay tuned for new download location as it becomes available
 
 Development process
 ===================
@@ -38,5 +38,5 @@ Issues with no commits will be given a similar warning, and closed after
 15 days from their last activity. Issues closed in this manner will be 
 labeled 'stale'. 
 
-Check out http://bit.ly/1bud0WT for more info about the development.
+Check out http://bit.ly/1ccGDK7 for more info about the development.
 This is an unofficial fork.

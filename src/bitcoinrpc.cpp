@@ -314,13 +314,14 @@ Value getdifficulty(const Array& params, bool fHelp)
 
 
 // Gamecoin: Return average network hashes per second based on last number of blocks.
+// Fixes suggested in https://bitcointalk.org/index.php?topic=124303.msg2515204#msg2515204
 Value GetNetworkHashPS(int lookup) {
     if (pindexBest == NULL)
         return 0;
 
     // If lookup is -1, then use blocks since last difficulty change.
     if (lookup <= 0)
-        lookup = pindexBest->nHeight % 2016 + 1;
+        lookup = pindexBest->nHeight % 48 + 1;
 
     // If lookup is larger than chain, then set it to chain length.
     if (lookup > pindexBest->nHeight)
@@ -341,10 +342,10 @@ Value getnetworkhashps(const Array& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnetworkhashps [blocks]\n"
-            "Returns the estimated network hashes per second based on the last 120 blocks.\n"
+            "Returns the estimated network hashes per second based on the last 576 blocks.\n"
             "Pass in [blocks] to override # of blocks, -1 specifies since last difficulty change.");
 
-    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 120);
+    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 576);
 }
 
 

@@ -918,7 +918,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     // Limit adjustment step
     int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
 
-    if(pindexLast->nHeight<25199)
+    if(pindexLast->nHeight<25199 || pindexLast->nHeight>=60000)
     {
         printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
         if (nActualTimespan < nTargetTimespan/4)
@@ -2438,7 +2438,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
         }
         else
         {
-            if(pfrom->nVersion < 80000)
+            if(pfrom->nVersion < 80100)
                 badVersion = true;
         }
         if(badVersion)

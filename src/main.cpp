@@ -835,9 +835,10 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
     return nSubsidy + nFees;
 }
 
-static int64 nTargetTimespan = 2 * 60 * 60; // 2 hours
-static int64 nTargetSpacing = 2.5 * 60; // 2.5 minutes
+static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Gamecoin: 3.5 days
+static int64 nTargetSpacing = 2.5 * 60; // Gamecoin: 2.5 minutes
 static int64 nInterval = nTargetTimespan / nTargetSpacing;
+
 //
 // minimum amount of work that could possibly be required nTime after
 // minimum work required was nBase
@@ -870,6 +871,14 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     // Genesis block
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
+
+    // From block 25200 onwards reassess the difficulty every 48 blocks
+    if(pindexLast->nHeight>=25199)
+    {
+        nTargetTimespan = 2 * 60 * 60; // 2 hours
+        nTargetSpacing = 2.5 * 60; // 2.5 minutes
+        nInterval = nTargetTimespan / nTargetSpacing;
+    } 
 
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
@@ -909,11 +918,21 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     // Limit adjustment step
     int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
 
-    printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
-    if (nActualTimespan < nTargetTimespan/4)
-        nActualTimespan = nTargetTimespan/4;
-    if (nActualTimespan > nTargetTimespan*4)
-        nActualTimespan = nTargetTimespan*4;
+    if(pindexLast->nHeight<25199 || pindexLast->nHeight>=60000)
+    {
+        printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
+        if (nActualTimespan < nTargetTimespan/4)
+            nActualTimespan = nTargetTimespan/4;
+        if (nActualTimespan > nTargetTimespan*4)
+            nActualTimespan = nTargetTimespan*4;
+    }
+    else
+    {    
+        if (nActualTimespan < nTargetTimespan/2)
+            nActualTimespan = nTargetTimespan/2;
+        if (nActualTimespan > nTargetTimespan*8)
+            nActualTimespan = nTargetTimespan*8;
+    } 
 
     // Retarget
     CBigNum bnNew;
@@ -2412,9 +2431,16 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(pfrom->nVersion < 80100)
-            badVersion = true;
-
+        if(nTime < 1376524800)
+        {
+            if(pfrom->nVersion < 60002)
+                badVersion = true;
+        }
+        else
+        {
+            if(pfrom->nVersion < 80100)
+                badVersion = true;
+        }
         if(badVersion)
         {
             printf("partner %s using obsolete version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);

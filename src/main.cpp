@@ -2431,16 +2431,9 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(nTime < 1376524800)
-        {
-            if(pfrom->nVersion < 60002)
-                badVersion = true;
-        }
-        else
-        {
-            if(pfrom->nVersion < 80100)
-                badVersion = true;
-        }
+        if(pfrom->nVersion < 80100)
+            badVersion = true;
+
         if(badVersion)
         {
             printf("partner %s using obsolete version %i; disconnecting\n", pfrom->addr.ToString().c_str(), pfrom->nVersion);

@@ -838,6 +838,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Gamecoin: 3.5 days
 static int64 nTargetSpacing = 2.5 * 60; // Gamecoin: 2.5 minutes
 static int64 nInterval = nTargetTimespan / nTargetSpacing;
+static const int64 nReTargetHistoryFact = 12;
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -908,6 +909,8 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     int blockstogoback = nInterval-1;
     if ((pindexLast->nHeight+1) != nInterval)
         blockstogoback = nInterval;
+    if (pindexLast->nHeight >= 62400)
+        blockstogoback = nReTargetHistoryFact * nInterval;
 
     // Go back by what we want to be 14 days worth of blocks
     const CBlockIndex* pindexFirst = pindexLast;

@@ -16,7 +16,7 @@
 #define CLIENT_VERSION_MAJOR       0
 #define CLIENT_VERSION_MINOR       8
 #define CLIENT_VERSION_REVISION    2
-#define CLIENT_VERSION_BUILD       0
+#define CLIENT_VERSION_BUILD       1
 
 static const int CLIENT_VERSION =
                            1000000 * CLIENT_VERSION_MAJOR
@@ -32,7 +32,7 @@ extern const std::string CLIENT_DATE;
 // network protocol versioning
 //
 
-static const int PROTOCOL_VERSION = 80200;
+static const int PROTOCOL_VERSION = 80201;
 
 // earlier versions not supported as of Feb 2012, and are disconnected
 static const int MIN_PROTO_VERSION = 209;

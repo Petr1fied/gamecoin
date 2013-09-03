@@ -883,9 +883,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         nTargetSpacing = 2.5 * 60; // 2.5 minutes
         nInterval = nTargetTimespan / nTargetSpacing;
     }
-    // From block 62550 onwards reduce the block time to 60 seconds and
-    // and reassess the difficulty every 2 blocks.
-    elseif(pindexLast->nHeight >= 62549)
+    else if(pindexLast->nHeight >= 62549)
     {
         nTargetTimespan = 120; // 2 minutes
         nTargetSpacing = 60; // 1 minute
@@ -922,7 +920,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         blockstogoback = nInterval;
     if (pindexLast->nHeight >= 62400 && pindexLast->nHeight < 62549)
         blockstogoback = nReTargetHistoryFact * nInterval;
-    elseif (pindexLast->nHeight >= 62549)
+    else if (pindexLast->nHeight >= 62549)
         blockstogoback = 1440;
 
     // Go back by what we want to be 14 days worth of blocks
@@ -942,7 +940,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         if (nActualTimespan > nTargetTimespan*4)
             nActualTimespan = nTargetTimespan*4;
     }
-    elseif(pindexLast->nHeight >= 62549)
+    else if(pindexLast->nHeight >= 62549)
     {
         if (nActualTimespan < nTargetTimespan/1.1)
             nActualTimespan = nTargetTimespan/1.1;

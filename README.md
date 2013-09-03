@@ -1,10 +1,10 @@
 Gamecoin - a lite version of Litecoin using scrypt as a proof of work scheme.
 
-- 2.5 minute block targets
-- 48 blocks (2 hours) to retarget difficulty
-- Subsidy halves every 840,000 blocks (~4 years)
-- ~1.67 billion total coins
-- 1000 coins per block
+- 1 minute block targets
+- 2 blocks (2 minutes) to retarget difficulty
+- Subsidy halves every 840,000 blocks (~1.6 years)
+- ~704 million total coins
+- 400 coins per block
 - Scrypt based
  
 Download
@@ -39,4 +39,3 @@ Issues with no commits will be given a similar warning, and closed after
 labeled 'stale'. 
 
 Check out http://bit.ly/1ccGDK7 for more info about the development.
-This is an unofficial fork.

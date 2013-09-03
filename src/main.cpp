@@ -830,6 +830,9 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 {
     int64 nSubsidy = 1000 * COIN;
 
+    if(nHeight >= 62550)
+        nSubsidy = 400 * COIN;
+
     nSubsidy >>= (nHeight / 840000);
 
     return nSubsidy + nFees;
@@ -873,13 +876,21 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
 
-    // From block 25200 onwards reassess the difficulty every 48 blocks
-    if(pindexLast->nHeight>=25199)
+    // From block 25200 to block 62549 reassess the difficulty every 48 blocks
+    if(pindexLast->nHeight >= 25199 && pindexLast->nHeight < 62549)
     {
         nTargetTimespan = 2 * 60 * 60; // 2 hours
         nTargetSpacing = 2.5 * 60; // 2.5 minutes
         nInterval = nTargetTimespan / nTargetSpacing;
-    } 
+    }
+    // From block 62550 onwards reduce the block time to 60 seconds and
+    // and reassess the difficulty every 2 blocks.
+    elseif(pindexLast->nHeight >= 62549)
+    {
+        nTargetTimespan = 120; // 2 minutes
+        nTargetSpacing = 60; // 1 minute
+        nInterval = nTargetTimespan / nTargetSpacing;
+    }
 
     // Only change once per interval
     if ((pindexLast->nHeight+1) % nInterval != 0)
@@ -909,8 +920,10 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     int blockstogoback = nInterval-1;
     if ((pindexLast->nHeight+1) != nInterval)
         blockstogoback = nInterval;
-    if (pindexLast->nHeight >= 62400)
+    if (pindexLast->nHeight >= 62400 && pindexLast->nHeight < 62549)
         blockstogoback = nReTargetHistoryFact * nInterval;
+    elseif (pindexLast->nHeight >= 62549)
+        blockstogoback = 1440;
 
     // Go back by what we want to be 14 days worth of blocks
     const CBlockIndex* pindexFirst = pindexLast;
@@ -921,7 +934,7 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     // Limit adjustment step
     int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
 
-    if(pindexLast->nHeight<25199 || pindexLast->nHeight>=60000)
+    if(pindexLast->nHeight < 25199 || (pindexLast->nHeight >= 60000 && pindexLast->nHeight < 62549))
     {
         printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
         if (nActualTimespan < nTargetTimespan/4)
@@ -929,13 +942,20 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         if (nActualTimespan > nTargetTimespan*4)
             nActualTimespan = nTargetTimespan*4;
     }
+    elseif(pindexLast->nHeight >= 62549)
+    {
+        if (nActualTimespan < nTargetTimespan/1.1)
+            nActualTimespan = nTargetTimespan/1.1;
+        if (nActualTimespan > nTargetTimespan*1.1)
+            nActualTimespan = nTargetTimespan*1.1;
+    }
     else
-    {    
+    {
         if (nActualTimespan < nTargetTimespan/2)
             nActualTimespan = nTargetTimespan/2;
         if (nActualTimespan > nTargetTimespan*8)
             nActualTimespan = nTargetTimespan*8;
-    } 
+    }
 
     // Retarget
     CBigNum bnNew;
@@ -2434,7 +2454,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(pfrom->nVersion < 80100)
+        if(pfrom->nVersion < 80300)
             badVersion = true;
 
         if(badVersion)

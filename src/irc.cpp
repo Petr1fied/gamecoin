@@ -299,8 +299,8 @@ void ThreadIRCSeed2(void* parg)
             Send(hSocket, "WHO #gmecoinTEST3\r");
         } else {
             // randomly join #gmecoin00-#gmecoin99
-            int channel_number = GetRandInt(100);
-            channel_number = 0; // Gamecoin: for now, just use one channel
+            // int channel_number = GetRandInt(100);
+            int channel_number = 1; // Gamecoin: for now, just use one channel
             Send(hSocket, strprintf("JOIN #gmecoin%02d\r", channel_number).c_str());
             Send(hSocket, strprintf("WHO #gmecoin%02d\r", channel_number).c_str());
         }

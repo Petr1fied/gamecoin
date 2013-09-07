@@ -830,9 +830,6 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 {
     int64 nSubsidy = 1000 * COIN;
 
-    if(nHeight >= 64000)
-        nSubsidy = 400 * COIN;
-
     nSubsidy >>= (nHeight / 840000);
 
     return nSubsidy + nFees;
@@ -841,7 +838,7 @@ int64 static GetBlockValue(int nHeight, int64 nFees)
 static int64 nTargetTimespan = 3.5 * 24 * 60 * 60; // Gamecoin: 3.5 days
 static int64 nTargetSpacing = 2.5 * 60; // Gamecoin: 2.5 minutes
 static int64 nInterval = nTargetTimespan / nTargetSpacing;
-static const int64 nReTargetHistoryFact = 12;
+static int64 nReTargetHistoryFact = 12;
 
 //
 // minimum amount of work that could possibly be required nTime after
@@ -876,18 +873,20 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     if (pindexLast == NULL)
         return nProofOfWorkLimit;
 
-    // From block 25200 to block 63999 reassess the difficulty every 48 blocks
-    if(pindexLast->nHeight >= 25199 && pindexLast->nHeight < 63999)
+    // From block 25200 to 64007, reassess the difficulty every 48 blocks
+    if(pindexLast->nHeight >= 25199 && pindexLast->nHeight < 64007)
     {
         nTargetTimespan = 2 * 60 * 60; // 2 hours
         nTargetSpacing = 2.5 * 60; // 2.5 minutes
         nInterval = nTargetTimespan / nTargetSpacing;
     }
-    else if(pindexLast->nHeight >= 63999)
+    // From block 64008 reassess the difficulty every 12 blocks
+    else if(pindexLast->nHeight >= 64007)
     {
-        nTargetTimespan = 120; // 2 minutes
-        nTargetSpacing = 60; // 1 minute
+        nTargetTimespan = 30 * 60; // 30 minutes
+        nTargetSpacing = 2.5 * 60; // 2.5 minutes
         nInterval = nTargetTimespan / nTargetSpacing;
+        nReTargetHistoryFact = 48;
     }
 
     // Only change once per interval
@@ -918,10 +917,8 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     int blockstogoback = nInterval-1;
     if ((pindexLast->nHeight+1) != nInterval)
         blockstogoback = nInterval;
-    if (pindexLast->nHeight >= 62400 && pindexLast->nHeight < 63999)
+    if ((pindexLast->nHeight >= 62400 && pindexLast->nHeight < 64000) || pindexLast->nHeight >= 64595)
         blockstogoback = nReTargetHistoryFact * nInterval;
-    else if (pindexLast->nHeight >= 63999)
-        blockstogoback = 1440;
 
     // Go back by what we want to be 14 days worth of blocks
     const CBlockIndex* pindexFirst = pindexLast;
@@ -930,9 +927,13 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
     assert(pindexFirst);
 
     // Limit adjustment step
-    int64 nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
+    int64 nActualTimespan = 0;
+    if (pindexLast->nHeight >= 64595)
+        nActualTimespan = (pindexLast->GetBlockTime() - pindexFirst->GetBlockTime())/nReTargetHistoryFact;
+    else
+        nActualTimespan = pindexLast->GetBlockTime() - pindexFirst->GetBlockTime();
 
-    if(pindexLast->nHeight < 25199 || (pindexLast->nHeight >= 60000 && pindexLast->nHeight < 63999))
+    if(pindexLast->nHeight < 25199 || (pindexLast->nHeight >= 60000 && pindexLast->nHeight < 64079))
     {
         printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
         if (nActualTimespan < nTargetTimespan/4)
@@ -940,8 +941,9 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         if (nActualTimespan > nTargetTimespan*4)
             nActualTimespan = nTargetTimespan*4;
     }
-    else if(pindexLast->nHeight >= 63999)
+    else if(pindexLast->nHeight >= 64079)
     {
+        printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
         if (nActualTimespan < nTargetTimespan/1.1)
             nActualTimespan = nTargetTimespan/1.1;
         if (nActualTimespan > nTargetTimespan*1.1)
@@ -2452,7 +2454,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv)
             return false;
         }
 
-        if(pfrom->nVersion < 80100)
+        if(pfrom->nVersion < 80400)
             badVersion = true;
 
         if(badVersion)

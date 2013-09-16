@@ -337,15 +337,17 @@ Value GetNetworkHashPS(int lookup) {
     return (boost::int64_t)(((double)GetDifficulty() * pow(2.0, 32)) / timePerBlock);
 }
 
+// Reverted to only look 48 blocks (4 retarget intervals) into the history.
+// Using 576 blocks (48 retarget intervals) can give very a inaccurate speed.
 Value getnetworkhashps(const Array& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnetworkhashps [blocks]\n"
-            "Returns the estimated network hashes per second based on the last 576 blocks.\n"
+            "Returns the estimated network hashes per second based on the last 48 blocks.\n"
             "Pass in [blocks] to override # of blocks, -1 specifies since last difficulty change.");
 
-    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 576);
+    return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 48);
 }
 
 

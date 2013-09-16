@@ -886,7 +886,10 @@ unsigned int static GetNextWorkRequired(const CBlockIndex* pindexLast, const CBl
         nTargetTimespan = 30 * 60; // 30 minutes
         nTargetSpacing = 2.5 * 60; // 2.5 minutes
         nInterval = nTargetTimespan / nTargetSpacing;
-        nReTargetHistoryFact = 48;
+        if(pindexLast->nHeight < 68999)
+            nReTargetHistoryFact = 48;
+        else
+            nReTargetHistoryFact = 4;
     }
 
     // Only change once per interval
